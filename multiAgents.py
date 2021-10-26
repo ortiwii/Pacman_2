@@ -15,7 +15,7 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
-
+import numpy as np
 from game import Agent
 
 class ReflexAgent(Agent):
@@ -73,8 +73,24 @@ class ReflexAgent(Agent):
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        food = newFood.asList()
+        score = 0
+        score = score + len(newScaredTimes) * 5
+        for ghostState in newGhostStates:
+            v1 = np.array(ghostState.getPosition())
+            v2 = np.array(newPos)
+            distantzia = np.linalg.norm(v1 - v2, ord=1)
+            if (distantzia < 2):
+                score = score - 20
+            elif (distantzia<3):
+                score = score - 10
+
+
+
+        #  if (len(food) < len(currentGameState.getFood.asList())):
+          #    score = score + 5'''
+
+        return successorGameState.getScore()+score
 
 def scoreEvaluationFunction(currentGameState):
     """
