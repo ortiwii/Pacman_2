@@ -73,6 +73,7 @@ class ReflexAgent(Agent):
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
+        #mamuetara distantziak kalkulatu
         food = newFood.asList()
         score = 0
         score = score + len(newScaredTimes) * 5
@@ -84,11 +85,24 @@ class ReflexAgent(Agent):
                 score = score - 20
             elif (distantzia<3):
                 score = score - 10
+            elif(distantzia>3):
+                score = score + 5
+       #janaria jan badu
+        prevfood=currentGameState.getNumFood()
+        sigfood=successorGameState.getNumFood()
+        dif=prevfood-sigfood
+        if (dif==1):
+          score = score + 5
+        # janarira distantzia kalkulatu
+        for foodstate in food:
+            v3= np.array(foodstate)
+            v4 = np.array(newPos)
+            dist = np.linalg.norm(v4 - v3, ord=1)
+            if (dist ==1):
+                score = score + 10
+            elif (dist>=2):
+                score = score - 20
 
-
-
-        #  if (len(food) < len(currentGameState.getFood.asList())):
-          #    score = score + 5'''
 
         return successorGameState.getScore()+score
 
