@@ -87,12 +87,16 @@ class ReflexAgent(Agent):
                 score = score - 10
             elif(distantzia>3):
                 score = score + 5
+
+
        #janaria jan badu
         prevfood=currentGameState.getNumFood()
         sigfood=successorGameState.getNumFood()
         dif=prevfood-sigfood
         if (dif==1):
           score = score + 5
+
+
         # janarira distantzia kalkulatu
         for foodstate in food:
             v3= np.array(foodstate)
@@ -100,9 +104,10 @@ class ReflexAgent(Agent):
             dist = np.linalg.norm(v4 - v3, ord=1)
             if (dist ==1):
                 score = score + 10
-            elif (dist>=2):
-                score = score - 20
-
+            elif (dist==2):
+                score = score + 5
+            elif(dist==3):
+                score = score + 2
 
         return successorGameState.getScore()+score
 
