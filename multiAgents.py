@@ -146,6 +146,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     Your minimax agent (question 2)
     """
 
+
     def getAction(self, gameState):
         """
         Returns the minimax action from the current gameState using self.depth
@@ -170,7 +171,37 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def minimax (gameState, agentIndex, depth):
+            if gameState.isWin() or gameState.isLose() or self.depth == depth: # Caso tribial donde se acaba la recursividad
+                return self.evaluationFunction(gameState)
+
+            if agentIndex == 0: # Estamos evaluando el PacMan, MAXIMIZAR PARA EL PACMAN
+                minimaxResults = []
+                for action in gameState.getLegalActions(agentIndex):
+                    minimaxResults.append(minimax(gameState.generateSuccessor(agentIndex, action), 1, depth))
+                return max(minimaxResults)
+
+            elif agentIndex > 0: # Estamos evaluando los fantasmas, MINIMIZAR PARA LOS FANTASMAS
+                nextAgentIndex = agentIndex + 1
+                if (nextAgentIndex == gameState.getNumAgents()): # Ultimo fantasma
+                    nextAgentIndex = 0
+                    depth = depth + 1
+                minimaxResults = []
+                for action in gameState.getLegalActions(agentIndex):
+                    minimaxResults.append(minimax(gameState.generateSuccessor(agentIndex, action), nextAgentIndex, depth))
+                return min(minimaxResults)
+
+        res = ''
+        maxP = -10000000.000
+        for action in gameState.getLegalActions(0):
+            puntos = minimax(gameState.generateSuccessor(0, action), 1, 0)
+            print(puntos)
+            if (puntos > maxP):
+                maxP = puntos
+                res = action
+        return res
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
