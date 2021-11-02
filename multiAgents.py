@@ -228,7 +228,35 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def expectimax(gameState, agentIndex, depth):
+            if gameState.isWin() or gameState.isLose() or self.depth == depth:  # Caso tribial donde se acaba la recursividad
+                return self.evaluationFunction(gameState)
+
+            if agentIndex == 0:  # Estamos evaluando el PacMan, MAXIMIZAR PARA EL PACMAN
+                expectimaxResults = []
+                for action in gameState.getLegalActions(agentIndex):
+                    expectimaxResults.append(expectimax(gameState.generateSuccessor(agentIndex, action), 1, depth))
+                return max(expectimaxResults)
+
+            elif agentIndex > 0:  # Estamos evaluando los fantasmas, MINIMIZAR PARA LOS FANTASMAS
+                nextAgentIndex = agentIndex + 1
+                if (nextAgentIndex == gameState.getNumAgents()):  # Ultimo fantasma
+                    nextAgentIndex = 0
+                    depth = depth + 1
+                expectimaxResults = []
+                for action in gameState.getLegalActions(agentIndex):
+                    expectimaxResults.append(expectimax(gameState.generateSuccessor(agentIndex, action), nextAgentIndex, depth))
+                return np.mean(expectimaxResults)
+
+        res = ''
+        maxP = -10000000.000
+        for action in gameState.getLegalActions(0):
+            puntos = expectimax(gameState.generateSuccessor(0, action), 1, 0)
+            if (puntos > maxP):
+                maxP = puntos
+                res = action
+        return res
 
 def betterEvaluationFunction(currentGameState):
     """
