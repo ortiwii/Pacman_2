@@ -77,6 +77,7 @@ class ReflexAgent(Agent):
         food = newFood.asList()
         score = 0
         score = score + len(newScaredTimes) * 5
+
         for ghostState in newGhostStates:
             v1 = np.array(ghostState.getPosition())
             v2 = np.array(newPos)
@@ -92,6 +93,7 @@ class ReflexAgent(Agent):
        #janaria jan badu
         prevfood=currentGameState.getNumFood()
         sigfood=successorGameState.getNumFood()
+        print(prevfood)
         dif=prevfood-sigfood
         if (dif==1):
           score = score + 5
@@ -266,7 +268,52 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    newPos = currentGameState.getPacmanPosition()
+    newFood = currentGameState.getFood()
+    newGhostStates = currentGameState.getGhostStates()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+    capsules = currentGameState.getCapsules()
+    food = newFood.asList()
+    score=0
+
+    #zenbat janari handi geratzen dira
+    if len(capsules) > 2:
+        score = score - 10
+
+    # zenbat janari normal geratzen dira
+    if(currentGameState.getNumFood() < 5):
+        score = score + 20
+
+
+    #zenbat aldiz beldurtu den mamua
+    if(newScaredTimes[0]>0):
+        score = score + 20
+
+    #mamuetara distantzia kalkulatu
+    for ghostState in newGhostStates:
+        v1 = np.array(ghostState.getPosition())
+        v2 = np.array(newPos)
+        distantzia = np.linalg.norm(v1 - v2, ord=1)
+        if (distantzia < 3):
+            score = score - 20
+        elif (distantzia <= 4):
+            score = score - 10
+        elif (distantzia > 4):
+            score = score + 5
+
+        # janarira distantzia kalkulatu
+    for foodstate in food:
+        v3 = np.array(foodstate)
+        v4 = np.array(newPos)
+        dist = np.linalg.norm(v4 - v3, ord=1)
+        if (dist == 1):
+            score = score + 10
+        elif (dist == 2):
+            score = score + 5
+        elif (dist == 3):
+            score = score + 2
+
+    return score + currentGameState.getScore()
 
 # Abbreviation
 better = betterEvaluationFunction
