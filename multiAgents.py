@@ -174,30 +174,34 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        def minimax (gameState, agentIndex, depth):
-            if gameState.isWin() or gameState.isLose() or self.depth == depth: # Caso tribial donde se acaba la recursividad
+        def value(gameState, agentIndex, actDepth):
+            if gameState.isWin() or gameState.isLose() or self.depth == actDepth:  # Caso tribial donde se acaba la recursividad
                 return self.evaluationFunction(gameState)
+            if agentIndex == 0:
+                return maxValue(gameState, actDepth)
+            else:
+                return minValue(gameState, actDepth,agentIndex)
 
-            if agentIndex == 0: # Estamos evaluando el PacMan, MAXIMIZAR PARA EL PACMAN
-                minimaxResults = []
-                for action in gameState.getLegalActions(agentIndex):
-                    minimaxResults.append(minimax(gameState.generateSuccessor(agentIndex, action), 1, depth))
-                return max(minimaxResults)
+        def maxValue(gameState, actDepth): # Estamos evaluando el PacMan, MAXIMIZAR PARA EL PACMAN
+            minimaxResults = []
+            for action in gameState.getLegalActions(0):
+                minimaxResults.append(value(gameState.generateSuccessor(0, action), 1, actDepth))
+            return max(minimaxResults)
 
-            elif agentIndex > 0: # Estamos evaluando los fantasmas, MINIMIZAR PARA LOS FANTASMAS
-                nextAgentIndex = agentIndex + 1
-                if (nextAgentIndex == gameState.getNumAgents()): # Ultimo fantasma
-                    nextAgentIndex = 0
-                    depth = depth + 1
-                minimaxResults = []
-                for action in gameState.getLegalActions(agentIndex):
-                    minimaxResults.append(minimax(gameState.generateSuccessor(agentIndex, action), nextAgentIndex, depth))
-                return min(minimaxResults)
+        def minValue(gameState, actDepth, ghostIndex):
+            nextGhostIndex = ghostIndex + 1
+            if (nextGhostIndex == gameState.getNumAgents()): # Ultimo fantasma
+                nextGhostIndex = 0
+                actDepth = actDepth + 1
+            minimaxResults = []
+            for action in gameState.getLegalActions(ghostIndex):
+                minimaxResults.append(value(gameState.generateSuccessor(ghostIndex, action), nextGhostIndex, actDepth))
+            return min(minimaxResults)
 
         res = ''
-        maxP = -10000000.000
+        maxP = float('-inf')
         for action in gameState.getLegalActions(0):
-            puntos = minimax(gameState.generateSuccessor(0, action), 1, 0)
+            puntos = value(gameState.generateSuccessor(0, action), 1, 0)
             print(puntos)
             if (puntos > maxP):
                 maxP = puntos
@@ -215,7 +219,55 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def value(gameState, agentIndex, actDepth, alpha, betta):
+            if gameState.isWin() or gameState.isLose() or self.depth == actDepth:  # Caso tribial donde se acaba la recursividad
+                return self.evaluationFunction(gameState)
+            if agentIndex == 0:
+                return maxValue(gameState, actDepth, alpha, betta)
+            else:
+                return minValue(gameState, actDepth, agentIndex, alpha, betta)
+
+        def maxValue(gameState, actDepth, alpha, betta): # Estamos evaluando el PacMan, MAXIMIZAR PARA EL PACMAN
+
+            v = float('-inf')
+            for action in gameState.getLegalActions(0):
+                v = max(v, value(gameState.generateSuccessor(0, action), 1, actDepth, alpha, betta))
+                if (v > betta):
+                    return v
+                alpha = max(alpha, v)
+            return v
+
+        def minValue(gameState, actDepth, ghostIndex, alpha, betta):
+            nextGhostIndex = ghostIndex + 1
+            v = float('inf')
+            if nextGhostIndex == gameState.getNumAgents(): # Ultimo fantasma
+                nextGhostIndex = 0
+                actDepth = actDepth + 1
+
+            for action in gameState.getLegalActions(ghostIndex):
+                v = min(v, value(gameState.generateSuccessor(ghostIndex, action), nextGhostIndex, actDepth, alpha, betta))
+                if (v < alpha):
+                    return v
+                betta = min(betta, v)
+            return v
+
+        res = ''
+        maxP = float('-inf')
+        alpha = float('-inf')
+        betta = float('+inf')
+        for action in gameState.getLegalActions(0):
+            puntos = value(gameState.generateSuccessor(0, action), 1, 0, alpha, betta)
+            if puntos > maxP:
+                maxP = puntos
+                res = action
+            if(puntos > betta):
+                return action
+            alpha = max(alpha, puntos)
+
+        return res
+
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
